@@ -248,8 +248,8 @@ model ItemTag {
 Refer to the screenshots bellow as a reference to the design and layout of the application.
 
 - @context/screenshots/dashboard-ui-main.png
-- @context/screenshots/sidebar-collapsed.png
-- @context/screenshots/dashboard-item-sheet.png
+- @context/screenshots/dashboard-ui-drawer.png
+
 
 ### Layout Structure
 
