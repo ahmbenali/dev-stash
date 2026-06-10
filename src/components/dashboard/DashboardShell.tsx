@@ -5,12 +5,22 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FolderPlus, PanelLeft, Plus, Search } from 'lucide-react'
 import Sidebar from './Sidebar'
+import type { CollectionWithMeta } from '@/lib/db/collections'
+import type { ItemTypeWithCount } from '@/lib/db/items'
+
+interface DashboardShellProps {
+  children: React.ReactNode
+  itemTypes: ItemTypeWithCount[]
+  favoriteCollections: CollectionWithMeta[]
+  recentCollections: CollectionWithMeta[]
+}
 
 export default function DashboardShell({
   children,
-}: {
-  children: React.ReactNode
-}) {
+  itemTypes,
+  favoriteCollections,
+  recentCollections,
+}: DashboardShellProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -73,7 +83,13 @@ export default function DashboardShell({
           />
         )}
 
-        <Sidebar collapsed={collapsed} mobileOpen={mobileOpen} />
+        <Sidebar
+          collapsed={collapsed}
+          mobileOpen={mobileOpen}
+          itemTypes={itemTypes}
+          favoriteCollections={favoriteCollections}
+          recentCollections={recentCollections}
+        />
 
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>

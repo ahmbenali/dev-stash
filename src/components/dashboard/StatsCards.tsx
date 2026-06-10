@@ -1,11 +1,9 @@
-import { mockCollections, mockItems } from '@/lib/mock-data'
+import { getItemStats } from '@/lib/db/items'
 import { Archive, BookMarked, FolderOpen, Star } from 'lucide-react'
 
-export default function StatsCards() {
-  const totalItems = mockItems.length
-  const totalCollections = mockCollections.length
-  const favoriteItems = mockItems.filter((i) => i.isFavorite).length
-  const favoriteCollections = mockCollections.filter((c) => c.isFavorite).length
+export default async function StatsCards() {
+  const { totalItems, totalCollections, favoriteItems, favoriteCollections } =
+    await getItemStats()
 
   const stats = [
     { label: 'Items', value: totalItems, Icon: Archive, iconClass: 'text-blue-400' },

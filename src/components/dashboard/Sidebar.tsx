@@ -11,17 +11,12 @@ import {
   Image,
   Link as LinkIcon,
   Star,
-  Clock,
   Settings,
   ChevronDown,
 } from 'lucide-react'
-import {
-  mockCollections,
-  mockItemTypeCounts,
-  mockItemTypes,
-  mockUser,
-} from '@/lib/mock-data'
 import { cn } from '@/lib/utils'
+import type { CollectionWithMeta } from '@/lib/db/collections'
+import type { ItemTypeWithCount } from '@/lib/db/items'
 
 const iconMap: Record<string, React.ElementType> = {
   Code,
@@ -36,20 +31,18 @@ const iconMap: Record<string, React.ElementType> = {
 interface SidebarProps {
   collapsed: boolean
   mobileOpen: boolean
+  itemTypes: ItemTypeWithCount[]
+  favoriteCollections: CollectionWithMeta[]
+  recentCollections: CollectionWithMeta[]
 }
 
-export default function Sidebar({ collapsed, mobileOpen }: SidebarProps) {
-  const favoriteCollections = mockCollections.filter((c) => c.isFavorite)
-  const recentCollections = mockCollections
-    .filter((c) => !c.isFavorite)
-    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-    .slice(0, 5)
-
-  const userInitials = mockUser.name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-
+export default function Sidebar({
+  collapsed,
+  mobileOpen,
+  itemTypes,
+  favoriteCollections,
+  recentCollections,
+}: SidebarProps) {
   return (
     <>
       {/* Desktop sidebar */}
@@ -61,9 +54,9 @@ export default function Sidebar({ collapsed, mobileOpen }: SidebarProps) {
       >
         <SidebarContent
           collapsed={collapsed}
+          itemTypes={itemTypes}
           favoriteCollections={favoriteCollections}
           recentCollections={recentCollections}
-          userInitials={userInitials}
         />
       </aside>
 
@@ -76,9 +69,9 @@ export default function Sidebar({ collapsed, mobileOpen }: SidebarProps) {
       >
         <SidebarContent
           collapsed={false}
+          itemTypes={itemTypes}
           favoriteCollections={favoriteCollections}
           recentCollections={recentCollections}
-          userInitials={userInitials}
         />
       </aside>
     </>
@@ -87,16 +80,16 @@ export default function Sidebar({ collapsed, mobileOpen }: SidebarProps) {
 
 interface SidebarContentProps {
   collapsed: boolean
-  favoriteCollections: typeof mockCollections
-  recentCollections: typeof mockCollections
-  userInitials: string
+  itemTypes: ItemTypeWithCount[]
+  favoriteCollections: CollectionWithMeta[]
+  recentCollections: CollectionWithMeta[]
 }
 
 function SidebarContent({
   collapsed,
+  itemTypes,
   favoriteCollections,
   recentCollections,
-  userInitials,
 }: SidebarContentProps) {
   const [favOpen, setFavOpen] = useState(true)
   const [recentOpen, setRecentOpen] = useState(true)
@@ -112,12 +105,8 @@ function SidebarContent({
             </p>
           )}
           <nav className="space-y-0.5">
-            {mockItemTypes.map((type) => {
-              const Icon = iconMap[type.icon] ?? File
-              const count =
-                mockItemTypeCounts[
-                  type.name as keyof typeof mockItemTypeCounts
-                ]
+            {itemTypes.map((type) => {
+              const Icon = iconMap[type.icon ?? ''] ?? File
               return (
                 <Link
                   key={type.id}
@@ -130,12 +119,12 @@ function SidebarContent({
                 >
                   <Icon
                     className="w-4 h-4 shrink-0"
-                    style={{ color: type.color }}
+                    style={{ color: type.color ?? undefined }}
                   />
                   {!collapsed && (
                     <>
                       <span className="flex-1 capitalize">{type.name}s</span>
-                      <span className="text-xs tabular-nums">{count}</span>
+                      <span className="text-xs tabular-nums">{type.count}</span>
                     </>
                   )}
                 </Link>
@@ -157,7 +146,6 @@ function SidebarContent({
                 onClick={() => setFavOpen((o) => !o)}
                 className="flex items-center gap-1.5 w-full px-2 py-1 hover:text-foreground transition-colors"
               >
-                <Star className="w-3 h-3 text-muted-foreground fill-current" />
                 <span className="flex-1 text-left text-xs text-muted-foreground font-medium">
                   Favorites
                 </span>
@@ -176,6 +164,7 @@ function SidebarContent({
                       href={`/collections/${collection.id}`}
                       className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                     >
+                      <Star className="w-3 h-3 shrink-0 fill-yellow-400 text-yellow-400" />
                       <span className="flex-1 truncate">{collection.name}</span>
                       <span className="text-xs tabular-nums">{collection.itemCount}</span>
                     </Link>
@@ -190,7 +179,6 @@ function SidebarContent({
                 onClick={() => setRecentOpen((o) => !o)}
                 className="flex items-center gap-1.5 w-full px-2 py-1 hover:text-foreground transition-colors"
               >
-                <Clock className="w-3 h-3 text-muted-foreground" />
                 <span className="flex-1 text-left text-xs text-muted-foreground font-medium">
                   Recent
                 </span>
@@ -209,6 +197,12 @@ function SidebarContent({
                       href={`/collections/${collection.id}`}
                       className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                     >
+                      <span
+                        className="w-2 h-2 rounded-full shrink-0"
+                        style={{
+                          backgroundColor: collection.dominantColor ?? '#6b7280',
+                        }}
+                      />
                       <span className="flex-1 truncate">{collection.name}</span>
                       <span className="text-xs tabular-nums">{collection.itemCount}</span>
                     </Link>
@@ -216,6 +210,14 @@ function SidebarContent({
                 </nav>
               )}
             </div>
+
+            {/* View all collections */}
+            <Link
+              href="/collections"
+              className="flex items-center px-2 py-1.5 mt-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              View all collections →
+            </Link>
           </div>
         )}
       </div>
@@ -228,17 +230,13 @@ function SidebarContent({
         )}
       >
         <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
-          <span className="text-primary-foreground text-xs font-semibold">
-            {userInitials}
-          </span>
+          <span className="text-primary-foreground text-xs font-semibold">JD</span>
         </div>
         {!collapsed && (
           <>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{mockUser.name}</p>
-              <p className="text-xs text-muted-foreground truncate">
-                {mockUser.email}
-              </p>
+              <p className="text-sm font-medium truncate">John Doe</p>
+              <p className="text-xs text-muted-foreground truncate">demo@devstash.io</p>
             </div>
             <button
               className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors shrink-0"
