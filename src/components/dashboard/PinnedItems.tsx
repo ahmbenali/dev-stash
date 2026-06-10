@@ -1,5 +1,5 @@
 import { Code, File, Image, Link as LinkIcon, Pin, Sparkles, StickyNote, Terminal } from 'lucide-react'
-import { mockItems, mockItemTypes } from '@/lib/mock-data'
+import { getPinnedItems } from '@/lib/db/items'
 
 const iconMap: Record<string, React.ElementType> = {
   Code,
@@ -11,18 +11,12 @@ const iconMap: Record<string, React.ElementType> = {
   Link: LinkIcon,
 }
 
-function getTypeInfo(itemTypeId: string) {
-  const type = mockItemTypes.find((t) => t.id === itemTypeId)
-  if (!type) return { Icon: File, color: '#6b7280' }
-  return { Icon: iconMap[type.icon] ?? File, color: type.color }
-}
-
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-export default function PinnedItems() {
-  const pinned = mockItems.filter((item) => item.isPinned)
+export default async function PinnedItems() {
+  const pinned = await getPinnedItems()
 
   if (pinned.length === 0) return null
 
@@ -34,7 +28,8 @@ export default function PinnedItems() {
       </div>
       <div className="space-y-3">
         {pinned.map((item) => {
-          const { Icon, color } = getTypeInfo(item.itemTypeId)
+          const Icon = item.type.icon ? (iconMap[item.type.icon] ?? File) : File
+          const color = item.type.color ?? '#6b7280'
           return (
             <div
               key={item.id}
