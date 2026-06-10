@@ -1,5 +1,5 @@
 import { Clock, Code, File, Image, Link as LinkIcon, Sparkles, StickyNote, Terminal } from 'lucide-react'
-import { mockItems, mockItemTypes } from '@/lib/mock-data'
+import { getRecentItems } from '@/lib/db/items'
 
 const iconMap: Record<string, React.ElementType> = {
   Code,
@@ -11,20 +11,12 @@ const iconMap: Record<string, React.ElementType> = {
   Link: LinkIcon,
 }
 
-function getTypeInfo(itemTypeId: string) {
-  const type = mockItemTypes.find((t) => t.id === itemTypeId)
-  if (!type) return { Icon: File, color: '#6b7280' }
-  return { Icon: iconMap[type.icon] ?? File, color: type.color }
-}
-
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-export default function RecentItems() {
-  const recent = [...mockItems]
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-    .slice(0, 10)
+export default async function RecentItems() {
+  const recent = await getRecentItems(10)
 
   return (
     <section>
@@ -34,7 +26,8 @@ export default function RecentItems() {
       </div>
       <div className="space-y-3">
         {recent.map((item) => {
-          const { Icon, color } = getTypeInfo(item.itemTypeId)
+          const Icon = item.type.icon ? (iconMap[item.type.icon] ?? File) : File
+          const color = item.type.color ?? '#6b7280'
           return (
             <div
               key={item.id}
