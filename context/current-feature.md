@@ -1,6 +1,6 @@
 # Current Feature
 
-Dashboard UI Phase 3
+Neon PostgreSQL + Prisma Setup
 
 ## Status
 
@@ -8,16 +8,18 @@ Completed
 
 ## Goals
 
-- 4 stats cards at the top: total items, collections, favorite items, favorite collections
-- Recent collections section
-- Pinned items section
-- 10 most recent items section
-- Use mock data from `src/lib/mock-data.js` directly (no database yet)
+- Set up Prisma 7 ORM with Neon PostgreSQL (serverless)
+- Create initial schema based on data models in `context/project-overview.md`
+- Include NextAuth models (Account, Session, VerificationToken)
+- Add appropriate indexes and cascade deletes
+- Always use `prisma migrate dev` — never `db push`
 
 ## Notes
 
-- Reference screenshot: `context/screenshots/dashboard-ui-main.png`
-- Full spec: `context/features/dashboard-phase-3-spec.md`
+- Full spec: `context/features/database-spec.md`
+- Use Prisma 7 (breaking changes from v6 — see upgrade guide)
+- DATABASE_URL = development branch, separate production branch
+- Reference data models: `context/project-overview.md`
 
 ## History
 
