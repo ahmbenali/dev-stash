@@ -1,25 +1,27 @@
 # Current Feature
 
-<!-- Feature Name -->
+Dashboard UI Phase 3
 
 ## Status
-
-<!-- Not Started|In Progress|Completed -->
 
 Completed
 
 ## Goals
 
-<!-- Goals & requirements -->
+- 4 stats cards at the top: total items, collections, favorite items, favorite collections
+- Recent collections section
+- Pinned items section
+- 10 most recent items section
+- Use mock data from `src/lib/mock-data.js` directly (no database yet)
 
 ## Notes
 
-<!-- Any extra notes -->
+- Reference screenshot: `context/screenshots/dashboard-ui-main.png`
+- Full spec: `context/features/dashboard-phase-3-spec.md`
 
 ## History
-
-<!-- Keep this updated. Earliest to latest -->
 
 - Initial Next.js setup and boilerplate cleanup
 - Dashboard UI Phase 1: ShadCN setup, /dashboard route, dark mode, top bar with search and buttons, sidebar and main placeholders
 - Dashboard UI Phase 2: Collapsible sidebar with item type links, favorite/recent collections, user avatar area, mobile drawer support
+- Dashboard UI Phase 3: Main area with stats cards, recent collections grid with type icons, pinned items, and 10 recent items
